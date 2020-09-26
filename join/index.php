@@ -1,7 +1,7 @@
-<!-- エラーの確認 -->
 <?php
 // 入力内容をセッションに保存する
 session_start();
+require('../dbconnect.php');
 
 if (!empty($_POST)) {
 	if ($_POST['name'] === '') {
@@ -25,6 +25,16 @@ if (!empty($_POST)) {
 			$error['image'] = 'type';
 		}
 	}
+	// アカウントの重複登録の確認
+	if(empty($error)) {
+		$member = $db->prepare('SELECT COUNT(*) AS cnt FROM members WHERE email=?');
+		$member->execute(array($_POST['email']));
+		$recode = $member->fetch();
+		if ($recode['cnt'] > 0) {
+			$error['email'] = 'deplicate';
+		}
+	}
+
 	// エラーがないときにcheck.phpにジャンプする
 	if (empty($error)) {
 		// アップロードするファイル名を作成　
@@ -80,6 +90,9 @@ if ($_REQUEST['action'] == 'rewrite' && isset($_SESSION['join'])) {
         	<input type="text" name="email" size="35" maxlength="255" value="<?php print(htmlspecialchars($_POST['email'], ENT_QUOTES)); ?>" />
 			<?php if ($error['email'] === 'blank'): ?>
 				<p class="error">※メールアドレスを入力してください</p>
+			<?php endif; ?>
+			<?php if ($error['email'] === 'deplicate'): ?>
+				<p class="error">※指定されたメールアドレスは既に登録されています</p>
 			<?php endif; ?>
 
 		<dt>パスワード<span class="required">必須</span></dt>
