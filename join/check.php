@@ -1,12 +1,28 @@
 <?php
 // 確認ページ
 session_start();
+require('../dbconnect.php');
 // 入力情報が正しく入力されていないときに確認ページに遷移した場合の処理
 if (!isset($_SESSION['join'])) {
 	// $_SESSION['join']に値が保存されていなかった場合、強制的にトップページに遷移させる
 	header('Location: index.php');
 	exit();
 }
+// user情報をデータベースに保存する
+if (!empty($_POST)) {
+	$statement = $db->prepare('INSERT INTO members SET name=?, email=?, password=?, picture=?, created=NOW()');
+	$statement->execute(array(
+		$_SESSION['join']['name'],
+		$_SESSION['join']['email'],
+		sha1($_SESSION['join']['password']),
+		$_SESSION['join']['image']
+	));
+	unset($_SESSION['join']); // セッション情報を空にする
+
+	header('Location: thanks.php');
+	exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
