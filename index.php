@@ -81,12 +81,16 @@ if (isset($_REQUEST['res'])) {
     <img src="member_picture/<?php print(htmlspecialchars($post['picture'], ENT_QUOTES)); ?>" width="48" height="48" alt="<?php print(htmlspecialchars($post['name'], ENT_QUOTES)); ?>" />
     <p><?php print(htmlspecialchars($post['message'], ENT_QUOTES)); ?><span class="name">（<?php print(htmlspecialchars($post['name'], ENT_QUOTES)); ?>）</span>[<a href="index.php?res=<?php print(htmlspecialchars($post['id'], ENT_QUOTES)); ?>">Re</a>]</p>
     <p class="day"><a href="view.php?id=<?php print(htmlspecialchars($post['id']));?>"><?php print(htmlspecialchars($post['created'], ENT_QUOTES)); ?></a>
+    <!-- 返信メッセージがある場合表示 -->
     <?php if ($post['reply_message_id'] > 0): ?>
       <a href="view.php?id=<?php print(htmlspecialchars($post['reply_message_id'], ENT_QUOTES)); ?>">
       返信元のメッセージ</a>
     <?php endif; ?>
-      [<a href="delete.php?id="
+    <!-- ログインユーザのメッセージのみ削除ボタン表示 -->
+    <?php if ($_SESSION['id'] == $post['member_id']): ?>
+      [<a href="delete.php?id=<?php print(htmlspecialchars($post['id'])); ?>"
       style="color: #F33;">削除</a>]
+    <?php endif; ?>
     </p>
     </div>
 <?php endforeach; ?>
